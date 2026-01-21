@@ -1,53 +1,92 @@
-# 🚦 Express Rate Limiting – Production-Ready API Protection
+# 🚀 Express Redis Starter
 
-A clean, scalable, and production-focused Express.js implementation demonstrating **API rate limiting best practices**.  
-This repository is designed to showcase **professional backend engineering standards**, including security, maintainability, and extensibility.
-
----
-
-## ✨ Why This Repository Exists
-
-APIs are vulnerable to:
-- Brute-force attacks
-- Abuse and scraping
-- Traffic spikes & denial-of-service attempts
-
-This project demonstrates **how to properly protect Express APIs** using rate limiting middleware while keeping the codebase clean, modular, and production-ready.
+A production-ready **Express.js** backend demonstrating **Redis integration**
+for caching, sessions, rate limiting, and performance optimization.
 
 ---
 
-## 🔑 Key Features
+## ✨ Features
 
-- ⚡ **Express.js best practices**
-- 🚦 **Configurable rate limiting**
-- 🧱 Middleware-based architecture
-- 🔄 Easily switch between **in-memory** and **Redis-backed** stores
-- 📁 Clean, scalable folder structure
-- 🔐 Security-focused defaults
-- 🧪 Easy to test and extend
+- Redis-based API caching
+- Cache invalidation strategies
+- Redis-backed session storage
+- Distributed rate limiting
+- Clean & modular Express architecture
 
 ---
 
-## 🚀 Getting Started
+## 🛠 Tech Stack
 
-### 1️⃣ Clone the repository
+- Node.js
+- Express.js
+- Redis
+- MongoDB / PostgreSQL (optional)
+- dotenv, ioredis, express-rate-limit
+
+---
+
+## 📂 Project Structure
+
 ```bash
-git clone https://github.com/your-username/express-rate-limiting.git
-cd express-rate-limiting
-``` 
+express-redis-starter/
+├── src/
+│   ├── config/
+│   │   ├── redis.js
+│   │   └── db.js
+│   ├── controllers/
+│   ├── routes/
+│   ├── middlewares/
+│   │   ├── cache.middleware.js
+│   │   └── rateLimiter.middleware.js
+│   └── app.js
+├── .env.example
+├── package.json
+├── server.js
+└── README.md
+```
 
-### 2️⃣ Install dependencies
+## 1️⃣ Clone the repository
+```bash
+git clone https://github.com/your-username/express-redis-starter.git
+cd express-redis-starter
+```
+
+## 2️⃣ Install dependencies
 ```bash
 npm install
-``` 
+```
 
-### 3️⃣ Configure environment variables
+## 3️⃣ Setup environment variables
+Create a .env file:
 ```bash
 cp .env.example .env
-``` 
 
-### 4️⃣ Start the server
+git clone https://github.com/your-username/express-redis-starter.git
+cd express-redis-starter
+```
+ Configure Redis and app settings:
+```bash
+PORT=5000
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=
+```
+
+## 4️⃣ Start Redis
+Using Docker:
+```bash
+docker run -d -p 6379:6379 redis
+```
+Or locally:
+```bash
+redis-server
+```
+
+## 5️⃣ Run the server
 ```bash
 npm run dev
-http://localhost:3000
-``` 
+```
+Application will be available at:
+```bash
+http://localhost:5000
+```
