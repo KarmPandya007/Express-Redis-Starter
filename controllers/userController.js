@@ -1,52 +1,80 @@
-import { People } from '../models/People.js'
+import {
+  getAllUsersFromDB,
+  findUserById,
+  createUserInDB,
+  updateUserInDB,
+  deleteUserInDB,
+  findUserByEmail,
+} from "../models/User.js";
+import bcrypt from "bcrypt";
 
-// Controller to get all people
-export const getAllPeople = async (req, res) => {
-    try {
-        const people = await People.find();
-        res.status(200).json(people);
-    } catch (error) {
-        res.status(500).json({ message: 'Error fetching people', error });
-    }
+// Get all users
+export const getUsers = async (req, res) => {
+  try {
+    const users = await getAllUsersFromDB();
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
-// Controller to get a person by ID
-export const getPersonById = async (req, res) => {
-    try {
-        const person = await People.findById(req.params.id);
-        if (!person) {
-            return res.status(404).json({ message: 'Person not found' });
-        }
-        res.status(200).json(person);
-    } catch (error) {
-        res.status(500).json({ message: 'Error fetching person', error });
+// Get single user by ID
+export const getUserById = async (req, res) => {
+  try {
+    const user = await findUserById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
-
-// Controller to update a person by ID
-export const updatePersonById = async (req, res) => {
-    try {
-        const updatedPerson = await People.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        if (!updatedPerson) {
-            return res.status(404).json({ message: 'Person not found' });
-        }
-        res.status(200).json(updatedPerson);
-    } catch (error) {
-        res.status(400).json({ message: 'Error updating person', error });
+// Create user
+export const createUser = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "Name, email, and password are required" });
     }
+
+    const existingUser = await findUserByEmail(email);
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists with this email" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await createUserInDB(name, email, hashedPassword);
+    res.status(201).json(newUser);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
-// Controller to delete a person by ID
-export const deletePersonById = async (req, res) => {
-    try {
-        const deletedPerson = await People.findByIdAndDelete(req.params.id);
-        if (!deletedPerson) {
-            return res.status(404).json({ message: 'Person not found' });
-        }
-        res.status(200).json({ message: 'Person deleted successfully' });
-    } catch (error) {
-        res.status(500).json({ message: 'Error deleting person', error });
+// Update user
+export const updateUser = async (req, res) => {
+  try {
+    const { name, email } = req.body;
+    const updatedUser = await updateUserInDB(req.params.id, name, email);
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
     }
+    res.json(updatedUser);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
+// Delete user
+export const deleteUser = async (req, res) => {
+  try {
+    const deletedUser = await deleteUserInDB(req.params.id);
+    if (!deletedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json({ message: "User deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
