@@ -20,7 +20,7 @@ for caching, sessions, rate limiting, and performance optimization.
 - Node.js
 - Express.js
 - Redis
-- MongoDB / PostgreSQL (optional)
+- MongoDB
 - dotenv, ioredis, express-rate-limit
 
 ---

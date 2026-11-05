@@ -7,16 +7,31 @@ import {
   findUserByEmail,
 } from "../models/User.js";
 import bcrypt from "bcrypt";
+import Redis from "ioredis";
+import User from "../models/User.js";
+
+const redis = new Redis(process.env.REDIS_URL)
 
 // Get all users
+// export const getUsers = async (req, res) => {
+//   try {
+//     const users = await getAllUsersFromDB();
+//     res.json(users);
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
 export const getUsers = async (req, res) => {
-  try {
-    const users = await getAllUsersFromDB();
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  const cachedUsers = await redis.get("users:all")
+  if(cachedUsers) {
+    return res.json(JSON.parse(cachedUsers))
   }
-};
+
+  const user = await User.find({})
+  await redis.set("users:all", JSON.stringify(user))
+  return res.json(user)
+}
 
 // Get single user by ID
 export const getUserById = async (req, res) => {
@@ -34,7 +49,7 @@ export const getUserById = async (req, res) => {
 // Create user
 export const createUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
     if (!name || !email || !password) {
       return res.status(400).json({ message: "Name, email, and password are required" });
     }
@@ -45,7 +60,7 @@ export const createUser = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = await createUserInDB(name, email, hashedPassword);
+    const newUser = await createUserInDB(name, email, hashedPassword, role);
     res.status(201).json(newUser);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -55,8 +70,8 @@ export const createUser = async (req, res) => {
 // Update user
 export const updateUser = async (req, res) => {
   try {
-    const { name, email } = req.body;
-    const updatedUser = await updateUserInDB(req.params.id, name, email);
+    const { name, email, role } = req.body;
+    const updatedUser = await updateUserInDB(req.params.id, name, email, role);
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
     }
