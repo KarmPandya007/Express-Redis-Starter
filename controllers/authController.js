@@ -1,16 +1,13 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { findUserByEmail, createUserInDB } from "../models/User.js";
-import redis from "ioredis";
-
-const redisClient = new redis(process.env.REDIS_URL);
+import { invalidateUsersCache } from "../config/redis.js";
 
 // Register
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
-    await redisClient.del("users:all") // Clear cache when a new user is created
     if (!name || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
@@ -22,6 +19,7 @@ export const registerUser = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await createUserInDB(name, email, hashedPassword, role);
+    await invalidateUsersCache();
 
     const userId = newUser._id || newUser.id;
     const token = jwt.sign(

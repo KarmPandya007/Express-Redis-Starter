@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
+import redis from "./config/redis.js";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 
@@ -25,9 +26,14 @@ app.use("/api/users", userRoutes);
 // Start server after connecting to database
 const startServer = async () => {
   await connectDB();
+  await redis.ping();
+  console.log("✅ Connected to Redis");
   app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT}`);
   });
 };
 
-startServer();
+startServer().catch((error) => {
+  console.error("❌ Server startup error:", error.message);
+  process.exit(1);
+});
