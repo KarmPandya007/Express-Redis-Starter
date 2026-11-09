@@ -17,7 +17,7 @@ app.use(express.json());
 
 // Routes
 app.get("/", (req, res) => {
-  res.json({ message: "Welcome to Express-Redis-BullMQ Tutorial 🚀" });
+  res.json({ message: "Welcome to Express-Redis-BullMQ Tutorial" });
 });
 
 app.use("/api/auth", authRoutes);
